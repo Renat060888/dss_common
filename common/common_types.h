@@ -13,6 +13,7 @@ class SourceManagerFacade;
 class AnalyticManagerFacade;
 class StorageEngineFacade;
 class SystemEnvironment;
+class CommunicationGatewayFacadeDSS;
 
 namespace common_types{
 
@@ -125,6 +126,7 @@ struct SIncomingCommandServices : SIncomingCommandGlobalServices {
     SourceManagerFacade * sourceManager;
     AnalyticManagerFacade * analyticManager;
     StorageEngineFacade * storageEngine;
+    CommunicationGatewayFacadeDSS * communicationGateway;
     std::function<void()> signalShutdownServer;
 };
 

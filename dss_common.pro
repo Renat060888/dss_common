@@ -28,6 +28,8 @@ LIBS += \
 
 # NOTE: paths for dev environment ( all projects sources in one dir )
 INCLUDEPATH +=  \
+    /usr/include/libmongoc-1.0 \
+    /usr/include/libbson-1.0 \
     $${INSTALL_PATH_INCLUDE}/rti1516e/ \
     $${ROOT_DIR}/microservice_common/ \
 

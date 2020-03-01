@@ -3,9 +3,12 @@
 
 #include <unordered_map>
 
-#include <dss_common/common/common_types.h>
+#include <microservice_common/system/wal.h>
+#include <microservice_common/storage/database_manager_base.h>
 
-class SystemEnvironment
+#include "common/common_types.h"
+
+class SystemEnvironment : public common_types::IWALPersistenceService
 {
 public:
     struct SServiceLocator {
@@ -17,7 +20,6 @@ public:
         SInitSettings()
         {}
         SServiceLocator services;
-        std::vector<common_types::TPid> zombieChildProcesses;
     };
 
     struct SState {
@@ -34,16 +36,27 @@ public:
     bool openContext( common_types::TContextId _ctxId );
     bool closeContext();
 
+    WriteAheadLogger * serviceForWriteAheadLogging();
 
 private:
     bool isApplicationInstanceUnique();
     void writePidFile();
 
+    // wal persistence functional is a part of 'SystemEnvironment' so far
+    virtual bool write( const common_types::SWALClientOperation & _clientOperation ) override;
+    virtual void remove( common_types::SWALClientOperation::TUniqueKey _filter ) override;
+    virtual const std::vector<common_types::SWALClientOperation> readOperations( common_types::SWALClientOperation::TUniqueKey _filter ) override;
+
+    virtual bool write( const common_types::SWALProcessEvent & _processEvent ) override;
+    virtual void remove( common_types::SWALProcessEvent::TUniqueKey _filter ) override;
+    virtual const std::vector<common_types::SWALProcessEvent> readEvents( common_types::SWALProcessEvent::TUniqueKey _filter ) override;
+
     // data
     SState m_state;
 
     // service
-
+    WriteAheadLogger m_wal;
+    DatabaseManager * m_database;
 
 
 

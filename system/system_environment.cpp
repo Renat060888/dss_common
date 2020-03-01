@@ -17,6 +17,7 @@ using namespace std;
 static constexpr const char * PRINT_HEADER = "SystemEnvironment:";
 
 SystemEnvironment::SystemEnvironment()
+    : m_database(nullptr)
 {
 
 }
@@ -24,6 +25,8 @@ SystemEnvironment::SystemEnvironment()
 SystemEnvironment::~SystemEnvironment()
 {
     VS_LOG_INFO << PRINT_HEADER << " begin shutdown" << endl;
+
+    DatabaseManager::destroyInstance( m_database );
 
     OBJREPR_BUS.shutdown();
 
@@ -34,7 +37,6 @@ bool SystemEnvironment::init( SInitSettings _settings ){
 
     m_state.settings = _settings;
 
-    // unique check
     if( ! isApplicationInstanceUnique() ){
         return false;
     }
@@ -42,22 +44,46 @@ bool SystemEnvironment::init( SInitSettings _settings ){
     // TODO: what for ?
     ::umask( 0 );
 
-    // objrepr
     if( ! OBJREPR_BUS.init() ){
         VS_LOG_CRITICAL << "objrepr init failed: " << OBJREPR_BUS.getLastError() << endl;
         return false;
     }    
 
-    // process-zombies
-    for( const common_types::TPid pid : _settings.zombieChildProcesses ){
+    DatabaseManager::SInitSettings settings3;
+    settings3.host = CONFIG_PARAMS.MONGO_DB_ADDRESS;
+    settings3.databaseName = CONFIG_PARAMS.MONGO_DB_NAME;
+
+    m_database = DatabaseManager::getInstance();
+    if( ! m_database->init(settings3) ){
+        return false;
+    }
+
+    WriteAheadLogger::SInitSettings settings2;
+    settings2.active = CONFIG_PARAMS.SYSTEM_RESTORE_INTERRUPTED_SESSION;
+    settings2.persistService = this;
+
+    if( ! m_wal.init(settings2) ){
+        return false;
+    }
+
+    if( ! CONFIG_PARAMS.SYSTEM_RESTORE_INTERRUPTED_SESSION ){
+        m_wal.cleanJournal();
+    }
+
+    const std::vector<common_types::TPid> zombieChildProcesses = m_wal.getNonClosedProcesses();
+    for( const common_types::TPid pid : zombieChildProcesses ){
         PROCESS_LAUNCHER.kill( pid );
     }
 
-    // pid
     writePidFile();
 
     VS_LOG_INFO << PRINT_HEADER << " init success" << endl;
     return true;
+}
+
+WriteAheadLogger * SystemEnvironment::serviceForWriteAheadLogging(){
+
+    return & m_wal;
 }
 
 bool SystemEnvironment::isApplicationInstanceUnique(){
@@ -95,8 +121,8 @@ void SystemEnvironment::writePidFile(){
 
 bool SystemEnvironment::openContext( common_types::TContextId _ctxId ){
 
-    if( ! ObjreprBus::singleton().openContextAsync(_ctxId) ){
-        m_state.lastError = ObjreprBus::singleton().getLastError();
+    if( ! OBJREPR_BUS.openContextAsync(_ctxId) ){
+        m_state.lastError = OBJREPR_BUS.getLastError();
         return false;
     }
     return true;
@@ -106,11 +132,63 @@ bool SystemEnvironment::openContext( common_types::TContextId _ctxId ){
 
 bool SystemEnvironment::closeContext(){
 
-    if( ! ObjreprBus::singleton().closeContext() ){
-        m_state.lastError = ObjreprBus::singleton().getLastError();
+    if( ! OBJREPR_BUS.closeContext() ){
+        m_state.lastError = OBJREPR_BUS.getLastError();
         return false;
     }
     return true;
 
 }
+
+bool SystemEnvironment::write( const common_types::SWALClientOperation & _clientOperation ){
+
+    return m_database->writeClientOperation( _clientOperation );
+}
+
+void SystemEnvironment::remove( common_types::SWALClientOperation::TUniqueKey _filter ){
+
+    m_database->removeClientOperation( _filter );
+}
+
+const std::vector<common_types::SWALClientOperation> SystemEnvironment::readOperations( common_types::SWALClientOperation::TUniqueKey _filter ){
+
+    if( common_types::SWALClientOperation::ALL_KEYS == _filter ){
+        return m_database->getClientOperations();
+    }
+    else if( common_types::SWALClientOperation::NON_INTEGRITY_KEYS == _filter ){
+        return m_database->getNonIntegrityClientOperations();
+    }
+    else{
+        assert( false );
+    }
+}
+
+bool SystemEnvironment::write( const common_types::SWALProcessEvent & _processEvent ){
+
+    return m_database->writeProcessEvent( _processEvent, true );
+}
+
+void SystemEnvironment::remove( common_types::SWALProcessEvent::TUniqueKey _filter ){
+
+    m_database->removeProcessEvent( _filter );
+}
+
+const std::vector<common_types::SWALProcessEvent> SystemEnvironment::readEvents( common_types::SWALProcessEvent::TUniqueKey _filter ){
+
+    if( common_types::SWALProcessEvent::ALL_PIDS != _filter && common_types::SWALProcessEvent::NON_INTEGRITY_PIDS != _filter ){
+        return m_database->getProcessEvents( _filter );
+    }
+    else if( common_types::SWALProcessEvent::ALL_PIDS == _filter ){
+        return m_database->getProcessEvents();
+    }
+    else if( common_types::SWALProcessEvent::NON_INTEGRITY_PIDS == _filter ){
+        return m_database->getNonIntegrityProcessEvents();
+    }
+    else{
+        assert( false );
+    }
+}
+
+
+
 
