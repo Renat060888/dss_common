@@ -120,6 +120,7 @@ struct SIncomingCommandServices : SIncomingCommandGlobalServices {
         , sourceManager(nullptr)
         , analyticManager(nullptr)
         , storageEngine(nullptr)
+        , communicationGateway(nullptr)
     {}
 
     SystemEnvironment * systemEnvironment;

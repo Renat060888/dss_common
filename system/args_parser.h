@@ -3,7 +3,7 @@
 
 #include <microservice_common/system/a_args_parser.h>
 
-enum class EDssArguments {
+enum class EPlayerArguments {
     SHELL_COMMAND_START_SERVER,
     SHELL_COMMAND_TO_SERVER,
     AS_DAEMON,
@@ -11,7 +11,7 @@ enum class EDssArguments {
     UNDEFINED
 };
 
-class ArgsParser : public AArgsParser<EDssArguments>
+class ArgsParser : public AArgsParser<EPlayerArguments>
 {
 public:
     static ArgsParser & singleton(){

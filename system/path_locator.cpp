@@ -10,7 +10,7 @@ using namespace std;
 
 static constexpr const char * PID_FILE_NAME = "/tmp/dss_unique_lock_file.pid";
 static constexpr const char * SHELL_IMITATION_DOMAIN_SOCKET_PATH = "/tmp/dss_shell_interface.socket";
-static constexpr const char * PRINT_HEADER = "SystemEnvironment:";
+static constexpr const char * PRINT_HEADER = "PathLocator:";
 
 // TODO: remove
 static const string g_tempPFN = PID_FILE_NAME;

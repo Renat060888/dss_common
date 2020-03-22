@@ -41,9 +41,7 @@ SOURCES += \
     communication/rti/rti_objects_manager.cpp \
     system/args_parser.cpp \
     system/config_reader.cpp \
-    system/objrepr_bus.cpp \
     system/path_locator.cpp \
-    system/system_environment.cpp
 
 HEADERS += \
     common/common_types.h \
@@ -57,6 +55,4 @@ HEADERS += \
     communication/rti/rti_objects_manager.h \
     system/args_parser.h \
     system/config_reader.h \
-    system/objrepr_bus.h \
     system/path_locator.h \
-    system/system_environment.h

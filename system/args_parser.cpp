@@ -24,19 +24,19 @@ bpo::options_description ArgsParser::getArgumentsDescrTemplateMethodPart() {
 void ArgsParser::checkArgumentsTemplateMethodPart( const bpo::variables_map & _varMap ) {
 
     if( _varMap.find("main-config") != _varMap.end() ){
-        m_commmandLineArgs[EDssArguments::MAIN_CONFIG_PATH_FROM_CONSOLE] = _varMap["main-config"].as<std::string>();
+        m_commmandLineArgs[EPlayerArguments::MAIN_CONFIG_PATH_FROM_CONSOLE] = _varMap["main-config"].as<std::string>();
     }
 
     if( _varMap.find("daemon") != _varMap.end() ){
-        m_commmandLineArgs[EDssArguments::AS_DAEMON] = "bla-bla";
+        m_commmandLineArgs[EPlayerArguments::AS_DAEMON] = "bla-bla";
     }
 
     if( _varMap.find("start") != _varMap.end() ){
-        m_commmandLineArgs[EDssArguments::SHELL_COMMAND_START_SERVER] = "bla-bla";
+        m_commmandLineArgs[EPlayerArguments::SHELL_COMMAND_START_SERVER] = "bla-bla";
     }
 
     if( _varMap.find("stop") != _varMap.end() ){
-        m_commmandLineArgs[EDssArguments::SHELL_COMMAND_TO_SERVER]
+        m_commmandLineArgs[EPlayerArguments::SHELL_COMMAND_TO_SERVER]
             = AArgsParser::getSettings().commandConvertor->getCommandsFromProgramArgs( { {"", ""} } );
     }
 }
