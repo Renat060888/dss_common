@@ -37,7 +37,7 @@ void ArgsParser::checkArgumentsTemplateMethodPart( const bpo::variables_map & _v
 
     if( _varMap.find("stop") != _varMap.end() ){
         m_commmandLineArgs[EPlayerArguments::SHELL_COMMAND_TO_SERVER]
-            = AArgsParser::getSettings().commandConvertor->getCommandsFromProgramArgs( { {"", ""} } );
+            = AArgsParser::getSettings().commandConvertor->getCommandFromProgramArgs( { {"", ""} } );
     }
 }
 

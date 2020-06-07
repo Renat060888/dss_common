@@ -31,6 +31,12 @@ bool ConfigReader::createCommandsFromConfig( const std::string & _content ){
     return true;
 }
 
-void ConfigReader::printToStdoutConfigExampleDerive(){
+string ConfigReader::getConfigExampleDerive(){
 
+    return string();
 }
+
+
+
+
+

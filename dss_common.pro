@@ -12,8 +12,9 @@ CONFIG += plugin
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 QMAKE_CXXFLAGS += -Wno-unused-variable
 
+# TODO: add defines to logger, system monitor, restbed webserver, database, etc...
 DEFINES += \
-    SWITCH_LOGGER_SIMPLE \
+    SWITCH_LOGGER_ASTRA \
 
 LIBS += \
     -lpthread \
@@ -24,13 +25,15 @@ LIBS += \
     -lRTI-NG \      # OpenRTI
     -lboost_program_options \ # TODO: wtf?
     -lboost_regex \
+    -lunilog \  # TODO: wtf?
+    -lobjrepr \  # TODO: wtf?
     -lmicroservice_common \
 
 # NOTE: paths for dev environment ( all projects sources in one dir )
 INCLUDEPATH +=  \
     /usr/include/libmongoc-1.0 \
     /usr/include/libbson-1.0 \
-    $${INSTALL_PATH_INCLUDE}/rti1516e/ \
+    /usr/include/rti1516e/ \
     $${ROOT_DIR}/microservice_common/ \
 
 SOURCES += \

@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 
+#include <microservice_common/communication/network_interface.h>
 #include <microservice_common/common/ms_common_types.h>
 
 // ---------------------------------------------------------------------------
@@ -12,7 +13,7 @@
 class SourceManagerFacade;
 class AnalyticManagerFacade;
 class StorageEngineFacade;
-class SystemEnvironment;
+class SystemEnvironmentFacade;
 class CommunicationGatewayFacadeDSS;
 
 namespace common_types{
@@ -65,14 +66,6 @@ enum class ENodeStatus {
 // ---------------------------------------------------------------------------
 // service interfaces
 // ---------------------------------------------------------------------------
-class IContextService {
-public:
-    virtual ~IContextService(){}
-
-    virtual bool open( int _contextId ) = 0;
-    virtual bool close( int _contextId ) = 0;
-};
-
 class IServiceInternalCommunication {
 public:
     virtual ~IServiceInternalCommunication(){}
@@ -123,7 +116,7 @@ struct SIncomingCommandServices : SIncomingCommandGlobalServices {
         , communicationGateway(nullptr)
     {}
 
-    SystemEnvironment * systemEnvironment;
+    SystemEnvironmentFacade * systemEnvironment;
     SourceManagerFacade * sourceManager;
     AnalyticManagerFacade * analyticManager;
     StorageEngineFacade * storageEngine;
