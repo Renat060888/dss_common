@@ -42,8 +42,24 @@ enum class ENodeStatus {
 // ---------------------------------------------------------------------------
 // simple ADT
 // ---------------------------------------------------------------------------
+struct SNodeAgentSimulateState {
+    TNodeId nodeAgentId;
 
+    // active nodes
+};
 
+struct SNodeAgentRealState {
+    TNodeId nodeAgentId;
+
+    // active nodes
+
+    // potential real objects
+};
+
+struct SNodeAgentDumpState {
+    TNodeId nodeAgentId;
+
+};
 
 
 
@@ -72,8 +88,6 @@ public:
 
     virtual PNetworkClient getNodeAgentCommunicator( const std::string & _uniqueId ) = 0;
     virtual PNetworkClient getNodeWorkerCommunicator( const std::string & _uniqueId ) = 0;
-    virtual PNetworkClient getPlayerAgentCommunicator() = 0;
-    virtual PNetworkClient getPlayerWorkerCommunicator( const std::string & _uniqueId ) = 0;
 };
 
 class IServiceExternalCommunication {

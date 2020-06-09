@@ -14,7 +14,10 @@ QMAKE_CXXFLAGS += -Wno-unused-variable
 
 # TODO: add defines to logger, system monitor, restbed webserver, database, etc...
 DEFINES += \
-    SWITCH_LOGGER_ASTRA \
+    SWITCH_LOGGER_SIMPLE \
+#    SWITCH_LOGGER_ASTRA \
+#    OBJREPR_LIBRARY_EXIST \
+#    UNIT_TESTS_GOOGLE \
 
 LIBS += \
     -lpthread \
@@ -25,15 +28,28 @@ LIBS += \
     -lRTI-NG \      # OpenRTI
     -lboost_program_options \ # TODO: wtf?
     -lboost_regex \
-    -lunilog \  # TODO: wtf?
-    -lobjrepr \  # TODO: wtf?
+    -lboost_system \
     -lmicroservice_common \
+
+contains( DEFINES, OBJREPR_LIBRARY_EXIST ){
+    message("connect 'unilog' and 'objrepr' libraries")
+LIBS += \
+    -lunilog \
+    -lobjrepr
+}
+
+contains( DEFINES, UNIT_TESTS_GOOGLE ){
+    message("connect 'gtests' library")
+LIBS += \
+    -lgtest
+}
 
 # NOTE: paths for dev environment ( all projects sources in one dir )
 INCLUDEPATH +=  \
     /usr/include/libmongoc-1.0 \
     /usr/include/libbson-1.0 \
-    /usr/include/rti1516e/ \
+#    /usr/include/rti1516e/ \
+    $${ROOT_DIR}/include/rti1516e/ \
     $${ROOT_DIR}/microservice_common/ \
 
 SOURCES += \
