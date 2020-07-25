@@ -1,0 +1,147 @@
+syntax = "proto3";
+package dss_protocol_agent_simula;
+import "dss_node_worker_simulation.proto"
+
+// ----------------------------------------------------------------------------------
+// PAYLOAD-TYPEDEFS
+// ----------------------------------------------------------------------------------
+enum EAgentType {
+	AT_SIMULATION = 0;	
+	AT_REAL = 1;
+	AT_DUMP = 2;
+    AT_UNDEFINED = 3;
+}
+
+message MessageSimulationWorkerConfig {
+	int64 processingIntervalMillisec = 1;
+	bool realtime = 2;
+}
+
+message MessageRealWorkerConfig {
+	int64 processingIntervalMillisec = 1;
+	string capability = 2;
+}
+
+message MessageDumpWorkerConfig {
+	bool realtime = 1;
+}
+
+message MessageAgentSystemInfo {
+	// TODO: do
+}
+
+message MessageAgentPluginsInfo {
+	// TODO: do
+}
+
+message MessageAgentRunnedWorkers {
+	// TODO: do
+	// simula | real | dump
+}
+
+
+// ----------------------------------------------------------------------------------
+// ROUTE-TYPEDEFS
+// ----------------------------------------------------------------------------------
+message MessageHeader {    
+	int32 ip_octets = 1;
+	int32 pid = 2;
+    string uuid = 3;
+    string module_name = 4;
+    string last_error = 5;   
+}
+
+enum EAgentToCoreCommandType {
+	ACCT_PING = 0;	
+    ACCT_UNDEFINED = 1;
+}
+
+enum EAgentToWorkerCommandType {
+	AWCT_CONFIGURE = 0;
+	AWCT_START = 1;
+	AWCT_PAUSE = 2;
+	AWCT_STOP = 3;
+	AWCT_SHUTDOWN = 4;
+	AWCT_LIVE_PROCESSING = 5;
+    AWCT_UNDEFINED = 6;
+}
+
+
+// ----------------------------------------------------------------------------------
+// REQUESTS TO CORE
+// ----------------------------------------------------------------------------------
+message MessageNodeAgentToCoreRequest {
+	MessageHeader header = 1;
+	
+	EAgentType agent_type = 2;
+	EAgentToCoreCommandType cmd_type = 3;
+
+	MessageRequestPing msg_ping = 4;	
+}
+
+message MessageRequestPing {
+	MessageAgentSystemInfo msg_system_info = 1;
+	MessageAgentPluginsInfo msg_plugins_info = 2;
+	MessageAgentRunnedWorkers msg_runned_workers = 3;
+}
+
+
+// ----------------------------------------------------------------------------------
+// RESPONSES TO CORE
+// ----------------------------------------------------------------------------------
+
+
+
+
+// ----------------------------------------------------------------------------------
+// REQUESTS TO WORKER
+// ----------------------------------------------------------------------------------
+message MessageNodeAgentToWorkerRequest {
+	MessageHeader header = 1;
+
+	EAgentToWorkerCommandType cmd_type = 2;
+
+	MessageRequestConfigure msg_configure = 3;
+	MessageRequestStart msg_start = 4;
+	MessageRequestPause msg_pause = 5;
+	MessageRequestStop msg_stop = 6;
+	MessageRequestShutdown msg_shutdown = 7;
+	MessageRequestLiveProcessing msg_live_processing = 8;
+}
+
+message MessageRequestConfigure {
+	MessageSimulationWorkerConfig msg_simula_worker_cfg = 1;
+	MessageRealWorkerConfig msg_real_worker_cfg = 2;
+	MessageDumpWorkerConfig msg_dump_worker_cfg = 3;	
+}
+
+message MessageRequestStart {	
+	// dummy
+}
+
+message MessageRequestPause {	
+	// dummy
+}
+
+message MessageRequestStop {	
+	// dummy
+}
+
+message MessageRequestShutdown {	
+	// dummy
+}
+
+message MessageRequestLiveProcessing {	
+	bool live = 1;
+}
+
+
+// ----------------------------------------------------------------------------------
+// RESPONSES TO WORKER
+// ----------------------------------------------------------------------------------
+
+
+
+
+
+

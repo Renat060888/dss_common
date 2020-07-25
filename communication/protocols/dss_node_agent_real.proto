@@ -1,0 +1,157 @@
+syntax = "proto3";
+package dss_protocol_agent_real;
+
+// hand-made RPC :)
+
+//  -------------------- Communication Map --------------------
+// Analytic Manager     --amqp->        Player Agent        ( create / destroy player )         protobuf
+// Analytic Manager     --amqp->        Player Controller   ( start / stop / update state )     protobuf
+// Client               --objrepr->     Player Controller   ( ...all stuff... )                 json
+// Client               --HTTP->        Player Controller   ( ...all stuff via web... )         json
+// [ Player Agent       --linux proc->  Player Controller   ( exec / kill ) ]                   -
+
+// ----------------------------------------------------------------------------------
+// PAYLOAD-TYPEDEFS
+// ----------------------------------------------------------------------------------
+
+
+
+
+// ----------------------------------------------------------------------------------
+// ROUTE-TYPEDEFS
+// ----------------------------------------------------------------------------------
+message MessageModuleUniqueId {
+	int32 ip_octets = 1;
+	int32 pid = 2;
+}
+
+message MessageHeader {    
+    MessageModuleUniqueId id = 1;
+    string module_name = 2;
+    string last_error = 3;   
+}
+
+enum EPlayerDDLCommandType {
+	PDCT_PLAYER_CREATE = 0;
+	PDCT_PLAYER_DESTROY = 1;	
+    PDCT_UNDEFINED = 2;
+}
+
+enum EPlayerDMLCommandType {
+	PDMCT_PLAY_START = 0;
+	PDMCT_PLAY_STOP = 1;	
+	PDMCT_PLAY_UPDATE_STATE = 2;		
+    PDMCT_UNDEFINED = 3;
+}
+
+
+
+// ----------------------------------------------------------------------------------
+// ANALYTIC MANAGER REQUESTS
+// ----------------------------------------------------------------------------------
+message MessageAnalyticManager {
+	MessageHeader header = 1;
+	
+	EPlayerDDLCommandType ddl_cmd_type = 2;
+	EPlayerDMLCommandType dml_cmd_type = 3;
+
+	MessageRequestPlayerCreate msg_player_create = 4;
+	MessageRequestPlayerDestroy msg_player_destroy = 5;
+	MessageRequestPlayStart msg_play_start = 6;
+	MessageRequestPlayStop msg_play_stop = 7;
+	MessageRequestPlayUpdateState msg_play_update_state = 8;
+}
+
+message MessageRequestPlayerCreate {
+	uint32 context_id = 1;  
+	string context_name = 2;  
+}
+
+message MessageRequestPlayerDestroy {	
+	uint32 context_id = 1;  
+}
+
+message MessageRequestPlayStart {	
+	// void
+}
+
+message MessageRequestPlayStop {	
+	// void
+}
+
+message MessageRequestPlayUpdateState {
+	// void
+}
+
+// ----------------------------------------------------------------------------------
+// PLAYER CONTROLLER AGENT
+// ----------------------------------------------------------------------------------
+message MessagePlayerAgent {
+	MessageHeader header = 1;
+
+	MessageResponsePlayerCreate msg_player_create = 2;
+	MessageResponsePlayerDestroy msg_player_destroy = 3;
+}
+
+message MessageResponsePlayerCreate {
+	bool success = 1;  
+}
+
+message MessageResponsePlayerDestroy {	
+	bool success = 1;  
+}
+
+// ----------------------------------------------------------------------------------
+// PLAYER CONTROLLER RESPONSE
+// ----------------------------------------------------------------------------------
+message MessagePlayerController {
+	MessageHeader header = 1;
+
+	MessageResponsePlayStart msg_play_start = 2;
+	MessageResponsePlayStop msg_play_stop = 3;
+	MessageResponsePlayUpdateState msg_play_update_state = 4;
+}
+
+message MessageResponsePlayStart {	
+	// void
+}
+
+message MessageResponsePlayStop {	
+	// void
+}
+
+message MessageResponsePlayUpdateState {
+	// void
+}
+
+
+
+// ----------------------------------------------------------------------------------
+// CLIENT REQUESTS ( JSON ? )
+// ----------------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------------
+// PLAYER CONTROLLER RESPONSE ( JSON ? )
+// ----------------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------------
+// MAIN
+// ----------------------------------------------------------------------------------
+enum EWho {
+	W_ANALYTIC_MANAGER = 0;
+	W_PLAYER_AGENT = 1;    
+    W_PLAYER_CONTROLLER = 2;    
+    W_UNDEFINED = 3;
+}
+
+message ProtobufInternalCommunicatePlayer{
+    EWho sender = 1;
+        
+    MessageAnalyticManager msg_analytic_manager = 2;
+    MessagePlayerAgent msg_player_agent = 3;    
+    MessagePlayerController msg_player_controller = 4;    
+}
+
+

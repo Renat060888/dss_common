@@ -1,0 +1,80 @@
+syntax = "proto3";
+package dss_protocol_core;
+import "dss_node_worker_simulation.proto"
+
+// ----------------------------------------------------------------------------------
+// PAYLOAD-TYPEDEFS
+// ----------------------------------------------------------------------------------
+
+
+
+
+// ----------------------------------------------------------------------------------
+// ROUTE-TYPEDEFS
+// ----------------------------------------------------------------------------------
+message MessageModuleUniqueId {
+	int32 ip_octets = 1;
+	int32 pid = 2;
+}
+
+message MessageHeader {    
+    MessageModuleUniqueId id = 1;
+    string module_name = 2;
+    string last_error = 3;   
+}
+
+enum ECoreCommandType {
+	CCT_REQUEST_WORKER = 0;
+	CCT_RELEASE_WORKER = 1;	
+	CCT_FORWARD_COMMAND_TO_WORKER = 2;
+    CCT_UNDEFINED = 3;
+}
+
+enum ECoreResponseType {
+	CRT_BLA = 0;	
+    CRT_UNDEFINED = 3;
+}
+
+
+// ----------------------------------------------------------------------------------
+// REQUESTS TO AGENT
+// ----------------------------------------------------------------------------------
+message MessageDSSCoreRequest {
+	MessageHeader header = 1;	
+	ECoreCommandType cmd_type = 2;	
+
+	MessageRequestRequestWorker msg_request_worker = 3;
+	MessageRequestDestroyWorker msg_release_worker = 4;	
+	MessageRequestForwardCommandToWorker msg_forward_command_to_worker = 5;
+}
+
+message MessageRequestRequestWorker {
+	uint32 context_id = 1;  	
+}
+
+message MessageRequestDestroyWorker {	
+	string worker_id = 1;  
+}
+
+message MessageRequestForwardCommandToWorker {	
+	
+}
+
+
+// ----------------------------------------------------------------------------------
+// RESPONSES TO AGENT ( may be )
+// ----------------------------------------------------------------------------------
+message MessageDSSCoreResponse {
+	MessageHeader header = 1;	
+	ECoreResponseType cmd_type = 2;
+	
+	MessageResponseBla msg_response_bla = 3;
+}
+
+message MessageResponseBla {	
+	
+}
+
+
+
+

@@ -61,6 +61,7 @@ SOURCES += \
     system/args_parser.cpp \
     system/config_reader.cpp \
     system/path_locator.cpp \
+    system/objrepr_bus_dss.cpp
 
 HEADERS += \
     common/common_types.h \
@@ -75,3 +76,5 @@ HEADERS += \
     system/args_parser.h \
     system/config_reader.h \
     system/path_locator.h \
+    system/objrepr_bus_dss.h \
+    common/common_utils.h

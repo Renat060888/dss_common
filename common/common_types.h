@@ -15,6 +15,7 @@ class AnalyticManagerFacade;
 class StorageEngineFacade;
 class SystemEnvironmentFacade;
 class CommunicationGatewayFacadeDSS;
+class CommunicationGatewayFacadeNode; // TODO: CommunicationGatewayFacade -> CommunicationGatewayFacadeBase
 
 namespace common_types{
 
@@ -42,26 +43,58 @@ enum class ENodeStatus {
 // ---------------------------------------------------------------------------
 // simple ADT
 // ---------------------------------------------------------------------------
-struct SNodeAgentSimulateState {
-    TNodeId nodeAgentId;
-
-    // active nodes
+struct SNodeState {
+    SNodeState()
+        : id("invalid_id") // common_vars::INVALID_NODE_ID
+        , agentId("invalid_id") // common_vars::INVALID_NODE_ID
+        , ctxId(0) // common_vars::INVALID_CONTEXT_ID
+        , status(common_types::ENodeStatus::UNDEFINED)
+        , busy(false)
+        , lastPingAtMillisec(0)
+    {}
+    common_types::TNodeId id;
+    common_types::TNodeId agentId;
+    common_types::TContextId ctxId;
+    common_types::ENodeStatus status;
+    bool busy;
+    int64_t lastPingAtMillisec;
+    std::string lastError;
 };
 
-struct SNodeAgentRealState {
-    TNodeId nodeAgentId;
-
-    // active nodes
-
-    // potential real objects
-};
-
-struct SNodeAgentDumpState {
-    TNodeId nodeAgentId;
+struct SNodeWorkerSimulationState : SNodeState {
 
 };
 
+struct SNodeWorkerRealState : SNodeState {
+    std::string realObjectName;
+    std::string caps;
+};
 
+struct SNodeWorkerDumpState : SNodeState {
+
+};
+
+struct SNodeAgentState {
+    SNodeAgentState()
+        : nodeAgentId("invalid_id")
+        , lastPingAtMillisec(0)
+    {}
+    TNodeId nodeAgentId;
+    int64_t lastPingAtMillisec;
+    std::string lastError;
+};
+
+struct SNodeAgentSimulateState : SNodeAgentState {
+    std::vector<SNodeWorkerSimulationState> nodeWorkers;
+};
+
+struct SNodeAgentRealState : SNodeAgentState {
+    std::vector<SNodeWorkerRealState> nodeWorkers;
+};
+
+struct SNodeAgentDumpState : SNodeAgentState {
+
+};
 
 // ---------------------------------------------------------------------------
 // exchange ADT ( component <-> store, component <-> network, etc... )
@@ -86,7 +119,8 @@ class IServiceInternalCommunication {
 public:
     virtual ~IServiceInternalCommunication(){}
 
-    virtual PNetworkClient getNodeAgentCommunicator( const std::string & _uniqueId ) = 0;
+    virtual PNetworkClient getCoreCommunicator() { assert( false && "not implemented by derive" ); }
+    virtual PNetworkClient getNodeAgentCommunicator( const std::string & _uniqueId ) { assert( false && "not implemented by derive" ); }
     virtual PNetworkClient getNodeWorkerCommunicator( const std::string & _uniqueId ) = 0;
 };
 
@@ -115,6 +149,12 @@ public:
     virtual void removeObserver( IUserDispatcherObserver * _observer ) = 0;
 };
 
+class INodeDispatcher {
+public:
+    virtual ~INodeDispatcher(){}
+
+    virtual void runSystemClock() = 0;
+};
 
 
 
@@ -128,6 +168,7 @@ struct SIncomingCommandServices : SIncomingCommandGlobalServices {
         , analyticManager(nullptr)
         , storageEngine(nullptr)
         , communicationGateway(nullptr)
+        , communicationGatewayNode(nullptr)
     {}
 
     SystemEnvironmentFacade * systemEnvironment;
@@ -135,6 +176,7 @@ struct SIncomingCommandServices : SIncomingCommandGlobalServices {
     AnalyticManagerFacade * analyticManager;
     StorageEngineFacade * storageEngine;
     CommunicationGatewayFacadeDSS * communicationGateway;
+    CommunicationGatewayFacadeNode * communicationGatewayNode;
     std::function<void()> signalShutdownServer;
 };
 
